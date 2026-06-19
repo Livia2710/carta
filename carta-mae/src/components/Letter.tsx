@@ -1,127 +1,128 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import LetterText from './LetterText'
+import Paper from './Paper'
 
-
-
-// ─── ESTÁGIOS ─────────────────────────────────────────────────
-// sealed   → envelope fechado com lacre
-// opening  → envelope abre (carta-aberta.png)
-// rising   → papel saindo do envelope (carta-papel.png)
-// reading  → zoom no papel sozinho (papel.png) + texto
+type Stage = 'sealed' | 'opening' | 'rising' | 'reading'
 
 export default function Letter() {
-  const [stage, setStage] = useState('sealed')
+  const [stage, setStage] = useState<Stage>('sealed')
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   function handleSealClick() {
-    // 1. Abre o envelope
     setStage('opening')
-
-    // 2. Após 900ms, mostra o papel saindo
-    setTimeout(() => setStage('rising'), 900)
-
-    // 3. Após mais 1200ms, faz o zoom no papel
-    setTimeout(() => setStage('reading'), 2100)
+    setTimeout(() => setStage('rising'), 600) 
+    setTimeout(() => setStage('reading'), 2000)  
   }
+
+  const envelopeImg = stage === 'sealed' ? '/assets/carta-fechada.png' : '/assets/carta-vazia.png'
 
   return (
     <div
-      className="relative flex items-center justify-center"
-      style={{ width: 520, height: 680 }}
+      className="relative flex items-center justify-center overflow-hidden"
+      style={{ width: '100vw', height: 680 }}
     >
+      {/* ── 1. ENVELOPE (FUNDO) ── */}
+      {stage !== 'reading' && (
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <img src={envelopeImg} alt="envelope fundo" className="w-full h-full object-contain" />
+        </div>
+      )}
 
-      {/* ── ENVELOPE (sealed → opening → rising) ── */}
+      {/* ── 2. O PAPEL (Totalmente escondido no bolso no início -> Sobe -> Zoom) ── */}
       <AnimatePresence>
-        {stage !== 'reading' && (
+        {(stage === 'opening' || stage === 'rising' || stage === 'reading') && (
           <motion.div
-            key="envelope"
-            className="absolute inset-0"
-            exit={{
-              scale: 0.85,
-              opacity: 0,
-              transition: { duration: 0.6, ease: 'easeIn' }
+            key="paper-container"
+            initial={
+              stage === 'rising' 
+                ? { y: -110, scale: 0.62, opacity: 1, x: '-50%' } // Se já estiver travado em rising, nasce direto no lugar correto
+                : { y: 95, scale: 0.58, opacity: 1, x: '-50%' }
+            }
+            animate={
+              stage === 'rising'
+                ? { 
+                    y:[ 95, -110, 40],
+                    scale: 0.62,
+                    opacity: 1,
+                  }
+                : stage === 'reading'
+                ? { 
+                    y: -20,    
+                    scale: 1,
+                    opacity: 1,
+                    zIndex: 50
+                  }
+                : { 
+                    y: 95,     
+                    scale: 0.58,
+                    opacity: 1,
+                    zIndex: 15
+                  }
+            }
+            transition={{ 
+              duration: stage === 'rising' ? 1.4 : 0.5, 
+              ease: [0.25, 1, 0.5, 1] ,
+            }}
+            style={{
+              position: 'absolute',
+              top: stage === 'reading' ? '3%' : '15%', 
+              left: '50%',
+              width: stage === 'reading' ? '85vw' : 340,
+              height: stage === 'reading' ? '100vh' : 460,
+              transformOrigin: 'center center',
+              zIndex: stage === 'opening' ? 15 : 50,
+              clipPath: stage === 'opening' ? 'inset(0px -150px 95px -150px)' : 'none', 
             }}
           >
-            <img
-              // Troca a imagem conforme o estágio sem remontar o elemento
-              src={
-                stage === 'sealed'
-                  ? '/assets/carta-fechada.png'
-                  : stage === 'opening'
-                  ? '/assets/carta-aberta.png'
-                  : '/assets/carta-papel.png'   // rising
-              }
-              alt="envelope"
-              className="w-full h-full object-contain"
-            />
+            <Paper ref={scrollRef}>
+              <AnimatePresence>
+                {stage === 'reading' && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="w-full h-full"
+                  >
+                    <LetterText {...({ scrollContainer: scrollRef } as any)} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Paper>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── LACRE DE CERA (só no sealed) ── */}
+      {/* ── 3. ENVELOPE (ABA DA FRENTE - COBRE O PAPEL NO INÍCIO) ── */}
+      {stage !== 'reading' && (
+        <div 
+          className="absolute inset-0 z-20 pointer-events-none"
+          style={{
+            // Subiu para 54% para cobrir mais espaço do topo e esconder o papel 100% no início
+            clipPath: 'inset(62% 0px 0px 0px)' 
+          }}
+        >
+          <img src={envelopeImg} alt="envelope frente" className="w-full h-full object-contain" />
+        </div>
+      )}
+
+      {/* ── 4. LACRE ── */}
       <AnimatePresence>
         {stage === 'sealed' && (
           <motion.button
             key="seal"
-            initial={{ scale: 1 }}
-            whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.88 }}
-            exit={{
-              scale: 0,
-              rotate: 180,
-              opacity: 0,
-              transition: { duration: 0.45 }
-            }}
+            initial={{ scale: 1, x: '-50%' }}
+            whileHover={{ scale: 1.12, x: '-50%' }}
+            whileTap={{ scale: 0.88, x: '-50%' }}
+            exit={{ scale: 0, rotate: 180, opacity: 0, transition: { duration: 0.45 } }}
             onClick={handleSealClick}
-            className="absolute z-10 cursor-pointer bg-transparent border-0 p-0"
-            style={{ bottom: '28%', left: '42%', transform: 'translateX(-50%)' }}
+            className="absolute cursor-pointer bg-transparent border-0 p-0"
+            style={{ bottom: '28%', left: '50%', zIndex: 30 }}
           >
-            <img
-              src="/assets/cera.png"
-              alt="lacre — clique para abrir"
-              style={{ width: 84, height: 84, objectFit: 'contain' }}
-            />
+            <img src="/assets/cera.png" alt="lacre" style={{ width: 84, height: 84, objectFit: 'contain' }} />
           </motion.button>
         )}
       </AnimatePresence>
-
-      {/* ── PAPEL COM ZOOM + TEXTO (reading) ── */}
-      <AnimatePresence>
-        {stage === 'reading' && (
-          <motion.div
-            key="paper"
-            initial={{ scale: 0.55, y: 80, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              position: 'relative',
-              width: 520,
-              height: '85vh',        // altura visível — papel não cresce infinito
-              maxHeight: 800,
-              backgroundImage: 'url(/assets/papel.png)',
-              backgroundSize: '100% 100%',   // estica pra cobrir exatamente o container
-              backgroundRepeat: 'no-repeat',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {/* Área scrollável com padding que respeita as bordas do papel */}
-            <div style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '4rem 3.5rem 3.5rem',   // padding generoso pras bordas florais
-              boxSizing: 'border-box',
-
-              /* Esconde a scrollbar mas mantém o scroll funcional */
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}>
-              <LetterText />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
     </div>
   )
 }

@@ -1,240 +1,142 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { forwardRef, ReactNode } from 'react'
 
-// Definindo a estrutura de uma memória para o TypeScript
-interface Memory {
-  date: string
-  title: string
-  body: string
-  image: string
-  imageCaption: string
+interface PaperProps {
+  children?: ReactNode
 }
 
-// ─────────────────────────────────────────────
-// EDITE AQUI — sua linha do tempo
-// ─────────────────────────────────────────────
-const memories: Memory[] = [
-  {
-    date: '1998',
-    title: 'Onde tudo começou',
-    body: 'Você sempre contou que naquele dia chovia muito. Mas pra você, dizem, o sol apareceu assim que me viu pela primeira vez.',
-    image: '/assets/fotos/foto1.jpg',
-    imageCaption: 'O começo de tudo',
-  },
-  {
-    date: '2005',
-    title: 'As tardes na cozinha',
-    body: 'O cheiro do seu bolo de laranja ainda é o cheiro de casa. Eu ficava no banco esperando a massa sobrar pra lamber a colher.',
-    image: '/assets/fotos/foto2.jpg',
-    imageCaption: 'A cozinha que era nosso world',
-  },
-  {
-    date: '2012',
-    title: 'Quando precisei mais de você',
-    body: 'Você não disse uma palavra. Só me abraçou. E foi suficiente. Sempre foi.',
-    image: '/assets/fotos/foto3.jpg',
-    imageCaption: 'Força que vem de você',
-  },
-  {
-    date: 'Hoje',
-    title: 'O que eu quero que você saiba',
-    body: 'Que eu te admiro. Que eu aprendo com você todo dia. Que nenhum presente vai traduzir o que você representa — mas eu tento assim mesmo.\n\nFeliz aniversário, mãe.',
-    image: '/assets/fotos/foto4.jpg',
-    imageCaption: 'Nós, agora',
-  },
-]
-
-// ─────────────────────────────────────────────
-// Animação de entrada por scroll
-// ─────────────────────────────────────────────
-interface FadeInWhenVisibleProps {
-  children: React.ReactNode
-  delay?: number
-}
-
-function FadeInWhenVisible({ children, delay = 0 }: FadeInWhenVisibleProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-80px 0px' })
+const Paper = forwardRef<HTMLDivElement, PaperProps>(({ children }, scrollRef) => {
+  const yPositions = [120, 200, 280, 360, 440, 520]
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
-      {children}
-    </motion.div>
-  )
-}
+      {/* ── SVG de fundo: papel com ornamentos florais ── */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+        viewBox="0 0 420 640"
+        preserveAspectRatio="none"
+      >
+        {/* Fundo pergaminho */}
+        <rect x="0" y="0" width="420" height="640"
+          rx="4" ry="4"
+          fill="#fdf6e8"
+          stroke="#d4b483"
+          strokeWidth="1.5"
+        />
 
-// ─────────────────────────────────────────────
-// Separador floral SVG
-// ─────────────────────────────────────────────
-function FloralDivider() {
-  return (
-    <div style={{ textAlign: 'center', margin: '2rem 0', color: 'var(--rose-400)', opacity: 0.7, fontSize: '1.2rem', letterSpacing: '0.5rem' }}>
-      ✦ ❀ ✦
-    </div>
-  )
-}
+        {/* Vinheta interna suave */}
+        <rect x="0" y="0" width="420" height="640"
+          rx="4" ry="4"
+          fill="none"
+          stroke="#c9a96e"
+          strokeWidth="8"
+          strokeOpacity="0.10"
+        />
 
-// ─────────────────────────────────────────────
-// Foto estilo polaroid
-// ─────────────────────────────────────────────
-interface PolaroidProps {
-  src: string
-  caption?: string
-}
+        {/* Linhas decorativas horizontais */}
+        <line x1="28" y1="68" x2="392" y2="68"
+          stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.45"
+        />
+        <line x1="28" y1="72" x2="392" y2="72"
+          stroke="#c9848a" strokeWidth="0.3" strokeOpacity="0.25"
+        />
+        <line x1="28" y1="568" x2="392" y2="568"
+          stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.45"
+        />
+        <line x1="28" y1="572" x2="392" y2="572"
+          stroke="#c9848a" strokeWidth="0.3" strokeOpacity="0.25"
+        />
 
-function Polaroid({ src, caption }: PolaroidProps) {
-  if (!src) return null
+        {/* Ornamento de canto — função inline via array */}
+        {([
+          [14, 14, 1, 1],
+          [406, 14, -1, 1],
+          [14, 626, 1, -1],
+          [406, 626, -1, -1],
+        ] as [number, number, number, number][]).map(([cx, cy, sx, sy], i) => (
+          <g key={i} transform={`translate(${cx}, ${cy}) scale(${sx}, ${sy})`} opacity="0.6">
+            <circle cx="0" cy="0" r="3" fill="#c9848a" />
+            <ellipse cx="11" cy="-4" rx="6" ry="2.5" fill="#c9848a" transform="rotate(-30)" />
+            <ellipse cx="-4" cy="11" rx="6" ry="2.5" fill="#c9848a" transform="rotate(60)" />
+            <ellipse cx="13" cy="5" rx="4.5" ry="2" fill="#8b3a42" transform="rotate(-10)" />
+            <ellipse cx="5" cy="13" rx="4.5" ry="2" fill="#8b3a42" transform="rotate(80)" />
+            <circle cx="9" cy="9" r="2" fill="#d4b483" />
+            {/* Hastes */}
+            <line x1="0" y1="0" x2="8" y2="-6" stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.6" />
+            <line x1="0" y1="0" x2="-6" y2="8" stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.6" />
+            <line x1="0" y1="0" x2="11" y2="3" stroke="#8b3a42" strokeWidth="0.5" strokeOpacity="0.5" />
+          </g>
+        ))}
 
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.85)',
-      padding: '12px 12px 40px',
-      boxShadow: 'var(--shadow-md)',
-      maxWidth: 280,
-      margin: '1.5rem auto',
-      transform: 'rotate(-1.5deg)',
-    }}>
-      <img
-        src={src}
-        alt={caption || ''}
-        style={{ width: '100%', display: 'block', aspectRatio: '4/3', objectFit: 'cover' }}
-      />
-      {caption && (
-        <p style={{
-          fontFamily: 'var(--font-title)',
-          fontSize: '1rem',
-          color: 'var(--ink-400)',
-          textAlign: 'center',
-          marginTop: 8,
-        }}>
-          {caption}
-        </p>
-      )}
-    </div>
-  )
-}
+        {/* Florzinhas laterais */}
+        {yPositions.map((y) => (
+          <g key={y}>
+            {/* Esquerda */}
+            <circle cx="10" cy={y} r="2.2" fill="#c9848a" opacity="0.38" />
+            <ellipse cx="10" cy={y - 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
+            <ellipse cx="10" cy={y + 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
+            <circle cx="10" cy={y} r="1" fill="#d4b483" opacity="0.5" />
+            {/* Direita */}
+            <circle cx="410" cy={y} r="2.2" fill="#c9848a" opacity="0.38" />
+            <ellipse cx="410" cy={y - 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
+            <ellipse cx="410" cy={y + 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
+            <circle cx="410" cy={y} r="1" fill="#d4b483" opacity="0.5" />
+          </g>
+        ))}
 
-// ─────────────────────────────────────────────
-// Item da linha do tempo
-// ─────────────────────────────────────────────
-interface MemoryItemProps {
-  memory: Memory
-  index: number
-}
+        {/* Pequeno motivo central superior */}
+        <g transform="translate(210, 40)" opacity="0.45">
+          <circle cx="0" cy="0" r="2.5" fill="#8b3a42" />
+          <ellipse cx="-10" cy="0" rx="5" ry="2" fill="#c9848a" />
+          <ellipse cx="10" cy="0" rx="5" ry="2" fill="#c9848a" />
+          <ellipse cx="0" cy="-8" rx="2" ry="4.5" fill="#c9848a" />
+          <circle cx="0" cy="0" r="1.2" fill="#fdf6e8" />
+        </g>
 
-function MemoryItem({ memory, index }: MemoryItemProps) {
-  const isLast = index === memories.length - 1
+        {/* Pequeno motivo central inferior */}
+        <g transform="translate(210, 600)" opacity="0.45">
+          <circle cx="0" cy="0" r="2.5" fill="#8b3a42" />
+          <ellipse cx="-10" cy="0" rx="5" ry="2" fill="#c9848a" />
+          <ellipse cx="10" cy="0" rx="5" ry="2" fill="#c9848a" />
+          <ellipse cx="0" cy="8" rx="2" ry="4.5" fill="#c9848a" />
+          <circle cx="0" cy="0" r="1.2" fill="#fdf6e8" />
+        </g>
+      </svg>
 
-  return (
-    <FadeInWhenVisible delay={0.1}>
-      <div style={{ marginBottom: '3rem' }}>
-
-        {/* Data */}
-        <FadeInWhenVisible delay={0.15}>
-          <p style={{
-            fontFamily: 'var(--font-title)',
-            fontSize: '1.1rem',
-            color: 'var(--rose-400)',
-            marginBottom: '0.25rem',
-            letterSpacing: '0.08em',
-          }}>
-            {memory.date}
-          </p>
-        </FadeInWhenVisible>
-
-        {/* Título */}
-        <FadeInWhenVisible delay={0.2}>
-          <h2 style={{
-            fontFamily: 'var(--font-body)',
-            fontWeight: 600,
-            fontSize: '1.35rem',
-            color: 'var(--ink-700)',
-            marginBottom: '0.75rem',
-            fontStyle: 'italic',
-          }}>
-            {memory.title}
-          </h2>
-        </FadeInWhenVisible>
-
-        {/* Foto polaroid */}
-        <FadeInWhenVisible delay={0.25}>
-          <Polaroid src={memory.image} caption={memory.imageCaption} />
-        </FadeInWhenVisible>
-
-        {/* Corpo do texto */}
-        <FadeInWhenVisible delay={0.3}>
-          {memory.body.split('\n\n').map((paragraph: string, i: number) => (
-            <p key={i} style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '1.1rem',
-              lineHeight: 1.9,
-              color: isLast ? 'var(--ink-700)' : 'var(--ink-400)',
-              fontWeight: isLast ? 400 : 300,
-              marginBottom: '1rem',
-            }}>
-              {paragraph}
-            </p>
-          ))}
-        </FadeInWhenVisible>
-
-        {/* Separador */}
-        {!isLast && <FloralDivider />}
+      {/* ── Área de conteúdo scrollável sobre o SVG ── */}
+      <div
+        ref={scrollRef}
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          flex: 1,
+          overflowY: 'auto',
+          padding: '4.5rem 3rem 4rem',
+          boxSizing: 'border-box',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none' as React.CSSProperties['msOverflowStyle'],
+        }}
+      >
+        {children}
       </div>
-    </FadeInWhenVisible>
-  )
-}
-
-// ─────────────────────────────────────────────
-// Componente principal
-// ─────────────────────────────────────────────
-export default function LetterText() {
-  return (
-    <div style={{
-      maxWidth: 560,
-      width: '100%',
-      padding: '5rem 2.5rem 6rem',
-      boxSizing: 'border-box',
-    }}>
-
-      {/* Saudação inicial */}
-      <FadeInWhenVisible>
-        <p className='font-title'>
-          Mãe querida,
-        </p>
-      </FadeInWhenVisible>
-
-      {/* Memórias */}
-      {memories.map((memory: Memory, index: number) => (
-        <MemoryItem key={index} memory={memory} index={index} />
-      ))}
-
-      {/* Assinatura */}
-      <FadeInWhenVisible delay={0.2}>
-        <div style={{ textAlign: 'right', marginTop: '2rem' }}>
-          <p style={{
-            fontFamily: 'var(--font-title)',
-            fontSize: '1.6rem',
-            color: 'var(--ink-700)',
-            fontStyle: 'italic',
-          }}>
-            Com todo o meu amor,
-          </p>
-          <p style={{
-            fontFamily: 'var(--font-title)',
-            fontSize: '2rem',
-            color: 'var(--rose-700)',
-            marginTop: '0.5rem',
-          }}>
-            Seu filho(a) 🌸
-          </p>
-        </div>
-      </FadeInWhenVisible>
-
     </div>
   )
-}
+})
+
+Paper.displayName = 'Paper'
+export default Paper
