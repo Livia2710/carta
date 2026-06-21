@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Ballet:opsz@16..72&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
 
+@theme {
+  --font-title: 'Ballet', cursive;
+  --font-body: 'Cormorant Garamond', serif;
+}
+
 :root {
   --font-title: 'Ballet', cursive;
   --font-body:  'Cormorant Garamond', serif;
@@ -32,6 +37,7 @@
 
 body {
   margin: 0;
+  font-family: var(--font-body);
 }
 
 #root {
@@ -39,17 +45,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Fundo vinho-âmbar escuro */
-  /* background-color: #3b1f1a;
-  background-image:
-    radial-gradient(ellipse at 30% 40%, #5c2d24 0%, #3b1f1a 55%, #1e0e0b 100%); */
-
-  /* Fundo bege-âmbar harmônico */
-/* background-color: #bfac96;
-background-image: radial-gradient(ellipse at 30% 40%, #dfd2c2 0%, #bfac96 55%, #594e41 100%); */
-
-
   /* Verde musgo escuro + vinheta nas bordas */
   background-color: #2c3a2e;
   background-image:
@@ -66,3 +61,10 @@ background-image: radial-gradient(ellipse at 30% 40%, #dfd2c2 0%, #bfac96 55%, #
 }
 
 
+.font-title {
+  font-family: 'Ballet', cursive;
+}
+
+.font-body {
+  font-family: 'Cormorant Garamond', serif;
+}

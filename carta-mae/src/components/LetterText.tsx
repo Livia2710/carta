@@ -1,142 +1,170 @@
-import { forwardRef, ReactNode } from 'react'
+import { useEffect, RefObject } from 'react'
 
-interface PaperProps {
-  children?: ReactNode
+interface LetterTextProps {
+  scrollContainer?: RefObject<HTMLDivElement | null>
 }
 
-const Paper = forwardRef<HTMLDivElement, PaperProps>(({ children }, scrollRef) => {
-  const yPositions = [120, 200, 280, 360, 440, 520]
+function useScrollReveal(scrollContainer?: RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const root = scrollContainer?.current ?? null
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { root, threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    )
+    const timeout = setTimeout(() => {
+      const els = root ? root.querySelectorAll('.reveal') : document.querySelectorAll('.reveal')
+      els.forEach((el) => observer.observe(el))
+    }, 100)
+    return () => { clearTimeout(timeout); observer.disconnect() }
+  }, [scrollContainer])
+}
 
+function Polaroid({ src, caption, rotate = 0, align = 'center' }: {
+  src: string; caption: string; rotate?: number; align?: 'left' | 'right' | 'center'
+}) {
+  const justify = align === 'left' ? 'justify-start' : align === 'right' ? 'justify-end' : 'justify-center'
   return (
-    <div
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* ── SVG de fundo: papel com ornamentos florais ── */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-        viewBox="0 0 420 640"
-        preserveAspectRatio="none"
-      >
-        {/* Fundo pergaminho */}
-        <rect x="0" y="0" width="420" height="640"
-          rx="4" ry="4"
-          fill="#fdf6e8"
-          stroke="#d4b483"
-          strokeWidth="1.5"
-        />
-
-        {/* Vinheta interna suave */}
-        <rect x="0" y="0" width="420" height="640"
-          rx="4" ry="4"
-          fill="none"
-          stroke="#c9a96e"
-          strokeWidth="8"
-          strokeOpacity="0.10"
-        />
-
-        {/* Linhas decorativas horizontais */}
-        <line x1="28" y1="68" x2="392" y2="68"
-          stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.45"
-        />
-        <line x1="28" y1="72" x2="392" y2="72"
-          stroke="#c9848a" strokeWidth="0.3" strokeOpacity="0.25"
-        />
-        <line x1="28" y1="568" x2="392" y2="568"
-          stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.45"
-        />
-        <line x1="28" y1="572" x2="392" y2="572"
-          stroke="#c9848a" strokeWidth="0.3" strokeOpacity="0.25"
-        />
-
-        {/* Ornamento de canto — função inline via array */}
-        {([
-          [14, 14, 1, 1],
-          [406, 14, -1, 1],
-          [14, 626, 1, -1],
-          [406, 626, -1, -1],
-        ] as [number, number, number, number][]).map(([cx, cy, sx, sy], i) => (
-          <g key={i} transform={`translate(${cx}, ${cy}) scale(${sx}, ${sy})`} opacity="0.6">
-            <circle cx="0" cy="0" r="3" fill="#c9848a" />
-            <ellipse cx="11" cy="-4" rx="6" ry="2.5" fill="#c9848a" transform="rotate(-30)" />
-            <ellipse cx="-4" cy="11" rx="6" ry="2.5" fill="#c9848a" transform="rotate(60)" />
-            <ellipse cx="13" cy="5" rx="4.5" ry="2" fill="#8b3a42" transform="rotate(-10)" />
-            <ellipse cx="5" cy="13" rx="4.5" ry="2" fill="#8b3a42" transform="rotate(80)" />
-            <circle cx="9" cy="9" r="2" fill="#d4b483" />
-            {/* Hastes */}
-            <line x1="0" y1="0" x2="8" y2="-6" stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.6" />
-            <line x1="0" y1="0" x2="-6" y2="8" stroke="#c9848a" strokeWidth="0.7" strokeOpacity="0.6" />
-            <line x1="0" y1="0" x2="11" y2="3" stroke="#8b3a42" strokeWidth="0.5" strokeOpacity="0.5" />
-          </g>
-        ))}
-
-        {/* Florzinhas laterais */}
-        {yPositions.map((y) => (
-          <g key={y}>
-            {/* Esquerda */}
-            <circle cx="10" cy={y} r="2.2" fill="#c9848a" opacity="0.38" />
-            <ellipse cx="10" cy={y - 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
-            <ellipse cx="10" cy={y + 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
-            <circle cx="10" cy={y} r="1" fill="#d4b483" opacity="0.5" />
-            {/* Direita */}
-            <circle cx="410" cy={y} r="2.2" fill="#c9848a" opacity="0.38" />
-            <ellipse cx="410" cy={y - 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
-            <ellipse cx="410" cy={y + 8} rx="3.5" ry="1.6" fill="#c9848a" opacity="0.22" />
-            <circle cx="410" cy={y} r="1" fill="#d4b483" opacity="0.5" />
-          </g>
-        ))}
-
-        {/* Pequeno motivo central superior */}
-        <g transform="translate(210, 40)" opacity="0.45">
-          <circle cx="0" cy="0" r="2.5" fill="#8b3a42" />
-          <ellipse cx="-10" cy="0" rx="5" ry="2" fill="#c9848a" />
-          <ellipse cx="10" cy="0" rx="5" ry="2" fill="#c9848a" />
-          <ellipse cx="0" cy="-8" rx="2" ry="4.5" fill="#c9848a" />
-          <circle cx="0" cy="0" r="1.2" fill="#fdf6e8" />
-        </g>
-
-        {/* Pequeno motivo central inferior */}
-        <g transform="translate(210, 600)" opacity="0.45">
-          <circle cx="0" cy="0" r="2.5" fill="#8b3a42" />
-          <ellipse cx="-10" cy="0" rx="5" ry="2" fill="#c9848a" />
-          <ellipse cx="10" cy="0" rx="5" ry="2" fill="#c9848a" />
-          <ellipse cx="0" cy="8" rx="2" ry="4.5" fill="#c9848a" />
-          <circle cx="0" cy="0" r="1.2" fill="#fdf6e8" />
-        </g>
-      </svg>
-
-      {/* ── Área de conteúdo scrollável sobre o SVG ── */}
+    <div className={`reveal flex ${justify} mb-1`}>
       <div
-        ref={scrollRef}
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          flex: 1,
-          overflowY: 'auto',
-          padding: '4.5rem 3rem 4rem',
-          boxSizing: 'border-box',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none' as React.CSSProperties['msOverflowStyle'],
-        }}
+        className="bg-[#fffef9] p-[10px] pb-7 shadow-[0_4px_18px_rgba(60,40,20,0.18)]"
+        style={{ transform: `rotate(${rotate}deg)`, width: 'clamp(140px, 42%, 190px)' }}
       >
-        {children}
+        <img src={src} alt={caption} className="w-full object-cover aspect-square block sepia-[0.08] contrast-[1.03]" />
+        <p className="mt-1.5 text-center text-[0.72rem] text-[--ink-400] leading-tight" style={{ fontFamily: 'var(--font-title)' }}>
+          {caption}
+        </p>
       </div>
     </div>
   )
-})
+}
 
-Paper.displayName = 'Paper'
-export default Paper
+function PolaroidPair({ left, right }: {
+  left: { src: string; caption: string; rotate?: number }
+  right: { src: string; caption: string; rotate?: number }
+}) {
+  return (
+    <div className="reveal flex gap-4 justify-center mb-1">
+      {[left, right].map((p, i) => (
+        <div
+          key={i}
+          className="bg-[#fffef9] p-[9px] pb-[26px] shadow-[0_4px_18px_rgba(60,40,20,0.18)] flex-1 min-w-0"
+          style={{ transform: `rotate(${p.rotate ?? 0}deg)` }}
+        >
+          <img src={p.src} alt={p.caption} className="w-full object-cover aspect-square block sepia-[0.08] contrast-[1.03]" />
+          <p className="mt-1 text-center text-[0.65rem] text-[--ink-400] leading-tight" style={{ fontFamily: 'var(--font-title)' }}>
+            {p.caption}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function P({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="reveal text-[--ink-700] leading-[1.85] mb-[1.1rem] indent-[1.5em] text-[clamp(0.95rem,2.5vw,1.1rem)]">
+      {children}
+    </p>
+  )
+}
+
+function Divider() {
+  return (
+    <div className="reveal text-center text-[--rose-400] tracking-[0.4em] my-5 opacity-60 select-none">
+      ✦ ✦ ✦
+    </div>
+  )
+}
+
+export default function LetterText({ scrollContainer }: LetterTextProps) {
+  useScrollReveal(scrollContainer)
+
+  return (
+    <>
+      <style>{`
+        .reveal {
+          opacity: 0;
+          transform: translateY(22px);
+          transition: opacity 0.75s ease, transform 0.75s ease;
+        }
+        .reveal.revealed {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
+
+      <h2
+        className="reveal text-center font-normal mb-[1.6rem] text-[--rose-700] text-[clamp(1.6rem,5vw,2rem)]"
+        style={{ fontFamily: 'var(--font-title)' }}
+      >
+        Minha querida mãe,
+      </h2>
+
+      {/* ✏️ Seu texto */}
+      <P>
+        Existem palavras que vivem escondidas dentro da gente por tanto tempo que a gente quase
+        esquece que elas existem. Esta carta é a tentativa de trazer algumas delas à luz.
+      </P>
+      <P>
+        Desde pequeno(a), aprendi com você o que significa estar presente — a mão que aparece
+        exatamente quando precisa, o olhar que entende antes mesmo das palavras.
+      </P>
+
+      <Polaroid src="/assets/fotos/foto1.jpeg" caption="sempre juntos ♡" rotate={-2.5} align="left" />
+      <Divider />
+
+      <P>
+        Lembro de tantas tardes que poderiam ser corriqueiras e que ficaram guardadas como tesouros.
+        A forma como você ria. O cheiro da sua cozinha nos domingos.
+      </P>
+      <P>
+        Você me ensinou que amor não é perfeição — é presença. É escolher ficar, mesmo quando é
+        difícil. É acreditar no outro mesmo quando ele ainda não acredita em si mesmo.
+      </P>
+
+      <PolaroidPair
+        left={{ src: '/assets/fotos/foto2.jpeg', caption: 'memórias que guardarei', rotate: -3 }}
+        right={{ src: '/assets/fotos/foto3.jpeg', caption: 'momentos assim ✨', rotate: 2 }}
+      />
+      <Divider />
+
+      <P>
+        Crescer é estranho. A gente vai ganhando mundo e às vezes esquece de olhar pra trás e
+        agradecer pelas raízes. Mas hoje eu quero parar e dizer: obrigado(a) por ser a minha raiz.
+      </P>
+      <P>
+        Não sei ao certo como o tempo passou tão rápido. Mas sei que cada momento ao seu lado valeu.
+        E que cada parte boa de quem eu sou tem um pouquinho de você dentro.
+      </P>
+
+      <Polaroid src="/assets/fotos/foto4.jpeg" caption="você é meu lar 🌿" rotate={2.5} align="right" />
+      <Divider />
+
+      <P>
+        Que esta carta chegue até você como um abraço longo — desses que a gente não quer terminar.
+        Com tudo que às vezes não consigo dizer quando você está na minha frente.
+      </P>
+
+      {/* Assinatura */}
+      <div className="reveal text-right mt-8 pr-2">
+        <p className="italic text-[--ink-400] text-base mb-1">
+          Com amor infinito,
+        </p>
+        <p
+          className="text-[--rose-700] text-[1.8rem] font-normal m-0"
+          style={{ fontFamily: 'var(--font-title)' }}
+        >
+          {/* ✏️ Seu nome */}
+          Suas filhas, Lívia e Lais
+        </p>
+      </div>
+    </>
+  )
+}
