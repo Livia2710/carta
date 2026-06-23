@@ -150,9 +150,6 @@ export default function LetterText({ scrollContainer }: LetterTextProps) {
 
       {/* Assinatura */}
       <div className="reveal text-right mt-8 pr-2">
-        <p className="italic text-[--ink-400] text-base mb-1">
-          Com amor infinito,Lívia e Laís
-        </p>
         <p
           className="text-[--rose-700] text-[1.8rem] font-normal m-0"
           style={{ fontFamily: 'var(--font-title)' }}
