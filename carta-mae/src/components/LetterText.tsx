@@ -16,7 +16,7 @@ function useScrollReveal(scrollContainer?: RefObject<HTMLDivElement | null>) {
           }
         })
       },
-      { root, threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+      { root, threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
     )
     const timeout = setTimeout(() => {
       const els = root ? root.querySelectorAll('.reveal') : document.querySelectorAll('.reveal')
@@ -101,7 +101,7 @@ export default function LetterText({ scrollContainer }: LetterTextProps) {
       `}</style>
 
       <h2
-        className="reveal text-center font-normal mb-[1.6rem] text-[--rose-700] text-[clamp(1.6rem,5vw,2rem)]">
+        className="reveal text-center font-title  tracking-[0.06em] leading-[1.2] mb-[1.6rem] text-[--rose-700] text-[clamp(1.6rem,5vw,2rem)]">
         Minha querida mãe,
       </h2>
 
@@ -148,13 +148,9 @@ export default function LetterText({ scrollContainer }: LetterTextProps) {
         Que esta carta chegue até você com tudo que às vezes não consigo dizer quando você está na minha frente.
       </P>
 
-      {/* Assinatura */}
-      <div className="reveal text-right mt-8 pr-2">
+      <div className="reveal text-right mt-16 pr-2 pb-15">
         <p
-          className="text-[--rose-700] text-[1.8rem] font-normal m-0"
-          style={{ fontFamily: 'var(--font-title)' }}
-        >
-          {/* ✏️ Seu nome */}
+          className="text-[--rose-700] text-md font-title m-1  tracking-[0.08em] ">
           Suas filhas, Lívia e Lais
         </p>
       </div>

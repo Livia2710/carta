@@ -59,7 +59,7 @@ export default function Letter() {
           >
             <div className="mt-20 text-center">
               <p className="text-base tracking-[0.15em] text-[#fdf8f0] opacity-85 mb-1">Para</p>
-            <p  className="text-[#fdf8f0] m-0 text-[2.4rem] font-normal">Carolina</p>
+            <p  className="text-[#fdf8f0] m-0 text-[2.4rem] font-title tracking-[0.08em]">Carolina</p>
             </div>
             <p className="absolute bottom-8 italic text-[#fdf8f0]  opacity-75 tracking-[0.08em] text-[0.95rem]">Clique para abrir a carta </p>
           </motion.div>
