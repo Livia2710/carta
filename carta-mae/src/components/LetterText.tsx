@@ -36,7 +36,7 @@ function Polaroid({ src, caption, rotate = 0, align = 'center' }: {
         className="bg-[#fffef9] p-[10px] pb-7 shadow-[0_4px_18px_rgba(60,40,20,0.18)]"
         style={{ transform: `rotate(${rotate}deg)`, width: 'clamp(140px, 42%, 190px)' }}
       >
-        <img src={src} alt={caption} className="w-full object-cover aspect-square block sepia-[0.08] contrast-[1.03]" />
+        <img src={src} alt={caption} className="w-full object-contain aspect-square block sepia-[0.08] contrast-[1.03]" />
         <p className="mt-1.5 text-center text-[0.72rem] text-[--ink-400] leading-tight" style={{ fontFamily: 'var(--font-title)' }}>
           {caption}
         </p>
@@ -101,9 +101,7 @@ export default function LetterText({ scrollContainer }: LetterTextProps) {
       `}</style>
 
       <h2
-        className="reveal text-center font-normal mb-[1.6rem] text-[--rose-700] text-[clamp(1.6rem,5vw,2rem)]"
-        style={{ fontFamily: 'var(--font-title)' }}
-      >
+        className="reveal text-center font-normal mb-[1.6rem] text-[--rose-700] text-[clamp(1.6rem,5vw,2rem)]">
         Minha querida mãe,
       </h2>
 
@@ -113,16 +111,16 @@ export default function LetterText({ scrollContainer }: LetterTextProps) {
         esquece que elas existem. Esta carta é a tentativa de trazer algumas delas à luz.
       </P>
       <P>
-        Desde pequeno(a), aprendi com você o que significa estar presente — a mão que aparece
-        exatamente quando precisa, o olhar que entende antes mesmo das palavras.
+        Desde pequena, aprendi que família não é perfeição. É olhar para o amálgama de caos e confusão que somos e tentar viver. 
+        Sempre fomos assim: uma confusão que de alguma forma dava certo (ou não, na maioria das vezes não).
       </P>
 
-      <Polaroid src="/assets/fotos/foto1.jpeg" caption="sempre juntos ♡" rotate={-2.5} align="left" />
+{/* Essa imagem esta cortando em cima, como arurmo isso, lmebrando que estou usando tailwindcss */}
+      <Polaroid src="/assets/fotos/foto1.jpeg" caption="sempre caos" rotate={-2.5} align="left" />
       <Divider />
 
       <P>
-        Lembro de tantas tardes que poderiam ser corriqueiras e que ficaram guardadas como tesouros.
-        A forma como você ria. O cheiro da sua cozinha nos domingos.
+        Lembro de tantas tardes que pareciam simples, mas que acabaram guardadas como pequenos tesouros. E em muitas delas você estava no centro de tudo: às vezes brigando conosco, às vezes rindo, sempre fazendo a casa parecer mais cheia. E, claro, com aquele cheiro maravilhoso vindo da sua cozinha.
       </P>
       <P>
         Você me ensinou que amor não é perfeição — é presença. É escolher ficar, mesmo quando é
@@ -130,32 +128,30 @@ export default function LetterText({ scrollContainer }: LetterTextProps) {
       </P>
 
       <PolaroidPair
-        left={{ src: '/assets/fotos/foto2.jpeg', caption: 'memórias que guardarei', rotate: -3 }}
-        right={{ src: '/assets/fotos/foto3.jpeg', caption: 'momentos assim ✨', rotate: 2 }}
+        left={{ src: '/assets/fotos/foto2.jpeg', caption: 'memórias que guardarei(mentira, foi a Bigu)', rotate: -3 }}
+        right={{ src: '/assets/fotos/foto3.jpeg', caption: 'momentos assim(zoe brisando)', rotate: 2 }}
       />
       <Divider />
 
       <P>
-        Crescer é estranho. A gente vai ganhando mundo e às vezes esquece de olhar pra trás e
-        agradecer pelas raízes. Mas hoje eu quero parar e dizer: obrigado(a) por ser a minha raiz.
+        Crescer é estranho. A gente vai mudando tanto, que quando olhamos para trás, não nos reconhecemos mais. 
+        E isso é so possivel, pelas pessoas que convivemos, voce com certeza teve uma grande impacto em mim.
       </P>
       <P>
-        Não sei ao certo como o tempo passou tão rápido. Mas sei que cada momento ao seu lado valeu.
-        E que cada parte boa de quem eu sou tem um pouquinho de você dentro.
+        Não sei ao certo como o tempo passou tão rápido. Mas sei que cada momento ao seu lado foi uma grande aprenizado.
       </P>
 
-      <Polaroid src="/assets/fotos/foto4.jpeg" caption="você é meu lar 🌿" rotate={2.5} align="right" />
+      <Polaroid src="/assets/fotos/foto4.jpeg" caption="Eramos fofos" rotate={2.5} align="right" />
       <Divider />
 
       <P>
-        Que esta carta chegue até você como um abraço longo — desses que a gente não quer terminar.
-        Com tudo que às vezes não consigo dizer quando você está na minha frente.
+        Que esta carta chegue até você com tudo que às vezes não consigo dizer quando você está na minha frente.
       </P>
 
       {/* Assinatura */}
       <div className="reveal text-right mt-8 pr-2">
         <p className="italic text-[--ink-400] text-base mb-1">
-          Com amor infinito,
+          Com amor infinito,Lívia e Laís
         </p>
         <p
           className="text-[--rose-700] text-[1.8rem] font-normal m-0"

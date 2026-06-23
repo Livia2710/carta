@@ -62,7 +62,7 @@ body {
 
 
 .font-title {
-  font-family: 'Ballet', cursive;
+  font-family: 'Ballet', cursive !important;
 }
 
 .font-body {
